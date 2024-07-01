@@ -1,3 +1,5 @@
+
+
 陕师大21级计量地理实验报告和作业个人记录
 
 -------
@@ -141,30 +143,31 @@ C_v = \frac{S}{\overline x} = \frac{1}{\overline x} \sqrt{\frac{\sum\limits_{i=1
 19. 一元线性回归:
 
     
+    
     $$
     k = \frac{\sum\limits_{i=1}^n \left(x_i-\overline x \right)  \left(y_i-\overline y \right)}{\sqrt{\sum\limits_{i=1}^n\left(x_i-\overline x\right)^2}}
-    $$
-
+$$
+    
     $$
     \widehat b = \overline y - k \overline x
-    $$
-
+$$
+    
     $$
     \text{自由度} f_1 = 1;f_2 = n-2
-    $$
-
+$$
+    
     $$
     \text{回归平方和} U = \sum\limits_{i=1}^n \left(\widehat y _i - \overline y\right)^2
-    $$
-
+$$
+    
     $$
     \text{误差平方和} Q = \sum\limits_{i=1}^n \left(\widehat y _i - y_i\right)^2
-    $$
-
+$$
+    
     $$
     总平方和 SST = U + Q = \sum\limits_{i=1}^n \left( y_i - \overline y\right)^2
-    $$
-
+$$
+    
     $$
     F = \frac{U/f_1}{Q/f_2}
     $$
