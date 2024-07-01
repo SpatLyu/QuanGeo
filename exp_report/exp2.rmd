@@ -1,0 +1,87 @@
+---
+title: "地理建模实验2 实验报告"
+author: "吕文博 地信2101班"
+date: "`r Sys.Date()`"
+output: #latex_document
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      dpi = 300,
+                      warning = FALSE,
+                      message = FALSE,
+                      out.width = "100%",
+                      out.height = "100%",
+                      fig.align = 'center',
+                      comment = "##",
+                      htmltools.dir.version = FALSE)
+```
+
+## `Pearson`相关系数计算和散点图绘制
+
+```{r}
+df_pearson = readxl::read_xls('../data/exp2/2.xls',sheet = 'Pearson')
+summary(df_pearson)
+cor.test(df_pearson$`数学`,
+         df_pearson$`化学`,
+         method = "pearson")
+```
+
+*数学和化学的`pearson`相关系数为**0.7420644**,P值为**0.0004219**,两者在0.01显著性水平下相关性显著*
+
+```{r}
+library(ggplot2)
+
+ggplot() +
+  geom_point(data = df_pearson,
+             aes(x = 数学,
+                 y = 化学)) +
+  coord_fixed() +
+  theme_classic()
+```
+
+## Spearman等级相关系数、Kendall's 等级相关系数计算
+
+```{r}
+df_rank = readxl::read_xls('../data/exp2/2.xls',sheet = 'Spearman')
+# 计算Spearman等级相关系数
+cor.test(df_rank$`作文1`,
+         df_rank$`作文2`,
+         method = "spearman")
+
+```
+
+*作文1和作文2的`spearman`相关系数为**0.8735153**,P值为**2.199e-06**,两者在0.01显著性水平下相关性显著*
+
+```{r}
+# 计算Kendall's等级相关系数
+cor.test(df_rank$`作文1`,
+         df_rank$`作文2`,
+         method = "kendall")
+```
+
+*作文1和作文2的`kendall`相关系数为**0.7451175**,P值为**2.33e-05**,两者在0.01显著性水平下相关性显著*
+
+## 偏相关系数计算
+
+```{r}
+df_p = readxl::read_xls('../data/exp2/2.xls',sheet = '偏相关')
+# 控制变量为温度
+ppcor::pcor.test(x = df_p$产量,
+                 y = df_p$降雨量,
+                 z = df_p$温度)
+```
+
+*当控制变量为温度时,产量和降雨量的偏相关系数为**0.7802799**,且P值**0.01310611**小于0.05,说明产量和降雨量相关性显著.*
+
+```{r}
+# 控制变量为降雨量
+ppcor::pcor.test(x = df_p$产量,
+                 y = df_p$温度,
+                 z = df_p$降雨量)
+```
+
+*当控制变量为降雨量时,产量和温度的偏相关系数为**0.8462227**,且P值**0.00402605**小于0.05,说明产量和温度相关性显著.*

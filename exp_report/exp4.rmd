@@ -1,0 +1,68 @@
+---
+title: "地理建模实验4 实验报告"
+author: "吕文博 地信2101班"
+date: "`r Sys.Date()`"
+output: latex_document
+  # prettydoc::html_pretty:
+  #   theme: tactile
+  #   highlight: github
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      dpi = 300,
+                      warning = FALSE,
+                      message = FALSE,
+                      out.width = "100%",
+                      out.height = "100%",
+                      fig.align = 'center',
+                      comment = "##",
+                      htmltools.dir.version = FALSE)
+```
+
+# `R` 语言多元线性回归
+
+### 加载数据
+
+```{r}
+dt = readxl::read_xlsx('../data/exp4/4.xlsx')
+skimr::skim(dt)
+```
+
+### 拟合多元线性回归模型
+
+```{r}
+lm.model = lm(`年降水量P/mm` ~ `纬度坐标Y（北纬0°）` + `海拔Z/m`,
+              data = dt)
+summary(lm.model)
+```
+
+*R方为0.8368,说明数据有83.68%的可能被该回归方程解释,数据与模型的拟合程度较高.*
+
+*由回归方程的F检验可得,$P < 2.2e-16 << 0.05$, F检验通过,说明回归方程显著,自变量能显著影响因变量.*
+
+*回归模型的方程为 $\text{年降水量} = -80.62259 \times \text{纬度坐标} + 0.04235 \times \text{海拔} + 3260.83143$ ,对自变量进行t检验,$P_{\text{纬度坐标}} < 2e-16 << 0.05$且$P_{\text{海拔}} = 0.0446 < 0.05$,纬度坐标和海拔的t检验都通过,说明两个自变量能显著影响因变量.*
+
+# `Python` 多元线性回归
+
+```{python,engine.path = "d:/miniconda3/envs/geocompy/python.exe"}
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+
+dt = pd.read_excel('../data/exp4/4.xlsx')
+dt.head()
+
+X = dt.loc[:,['纬度坐标Y（北纬0°）','海拔Z/m']]
+y = dt.loc[:,'年降水量P/mm']
+X = sm.add_constant (X)
+lm_model = sm.OLS(y,X).fit()
+print(lm_model.summary())
+```
+
+*R方为0.837,说明数据有83.7%的可能被该回归方程解释,数据与模型的拟合程度较高.*
+
+*由回归方程的F检验可得,$P = 5.16e-20 << 0.05$, F检验通过,说明回归方程显著,自变量能显著影响因变量.*
+
+*回归模型的方程为 $\text{年降水量} = -80.6226 \times \text{纬度坐标} + 0.0424 \times \text{海拔} + 3260.8314$ ,对自变量进行t检验,$P_{\text{纬度坐标}} = 0 << 0.05$且$P_{\text{海拔}} = 0.045 < 0.05$,纬度坐标和海拔的t检验都通过,说明两个自变量能显著影响因变量.*

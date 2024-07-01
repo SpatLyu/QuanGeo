@@ -1,0 +1,103 @@
+---
+title: "Trend_Surface_Analysis"
+author: "Yungbob Lyu"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      dpi = 600,
+                      warning = FALSE,
+                      message = FALSE,
+                      out.width = "100%",
+                      out.height = "100%",
+                      fig.align = 'center',
+                      comment = "##",
+                      htmltools.dir.version = FALSE)
+```
+
+## 趋势面分析原理
+
+  假设$Z_i (x_i,y_i)$表示所要分析的地理要素的实际观测值,即特征值.其中$(x_i,y_i)$为所要研究的地理区域内各调查点的坐标值,把测试值$Z_i (x_i,y_i)$的变化分解成”区域特征”和”局部特征”两个部分,即:
+
+$$
+Z_i \left(x_i,y_i\right) = f\left(x_i,y_i\right) + \epsilon_i \tag1
+$$
+
+  式中$f(x_i,y_i)$为趋势值,表示由整个区域因素决定的部分,反映了在较大区域范 围内$Z$随着$x$和$y$变化的特点;而$\epsilon_i$为剩余值(残差值),表示由局部区域因 素和随机因素决定的部分,反映了在局部区域范围内$Z$有异于一般规律变化的情况和 随机性的干扰所造成的偏差.
+
+  趋势面分析的核心就是从实际值出发推算趋势面.使得残差平方和趋于最 小.以此来估计趋势面参数， 是在最小二乘法意义下的趋势面拟合.
+
+  在趋势面分析中,通常选择多项式作为回归方程:
+
+  *一阶趋势面函数:* 
+$$
+f_1\left(x_i,y_i\right) = b_0 + b_1 x + b_2 y
+$$ 
+  *二阶趋势面函数:* 
+$$
+f_2\left(x_i,y_i\right) = b_0 + b_1 x + b_2 y + b_3 x^2 + b_4 xy + b_5 y^2
+$$ 
+  *三阶趋势面函数:* 
+$$
+f_3\left(x_i,y_i\right) = b_0 + b_1 x + b_2 y + b_3 x^2 + b_4 xy + b_5 y^2 + b_6 x^3 + b_7 x^2y + b_8 xy^2 + b-9 y^3
+$$
+  *`n` 阶趋势面函数:*
+$$
+f_n\left(x_i,y_i\right) = b_0 + b_1 x + b_2 y + b_3 x^2 + b_4 xy + b_5 y^2 + \cdots + b_p y^n
+$$
+*其中,$q = \frac{n(n+3)}{2}$*
+
+## 一个案例
+
+```{r}
+x = c(0,1.1,1.8,2.95,3.4,1.8,0.7,0.2,0.85,1.65,2.65,3.65)
+y = c(1,0.6,0,0,0.2,1.7,1.3,2,3.35,3.15,3.1,2.55)
+z = c(27.6,38.4,24,24.7,32,55.5,40.4,37.5,31,31.7,53,44.9)
+
+surf.ls = \(x, y, z, np = 3, grid.lines = 100){
+  require(magrittr)
+  require(plotly)
+  generatesurf = \(n,x = 'x',y = 'y'){if(n==1){return(paste0(x,'+',y))}
+                      else{return(paste0(generatesurf(n-1,x,y),'+',
+                                  paste0(x,'^',n:0,'*',y,'^',0:n,
+                                         collapse = '+')))}}
+  if(np <= 0){
+    stop('Please provide a positive integar!')
+    }else{newdata = generatesurf(np) %>% 
+    stringr::str_split('\\+') %>% 
+    purrr::pluck(1) %>% 
+    purrr::map_dfc(\(i) eval(parse(text = i))) %>% 
+    purrr::set_names(paste0('x',1:ncol(.))) %>% 
+    dplyr::mutate(y = z)}
+  fit = lm('y ~ .',data = newdata)
+  x.pred = seq(min(x), max(x), length.out = grid.lines)
+  y.pred = seq(min(y), max(y), length.out = grid.lines)
+  xy = generatesurf(np,'x.pred','y.pred') %>%
+    stringr::str_split('\\+') %>%
+    purrr::pluck(1) %>%
+    purrr::map_dfc(\(i) eval(parse(text = i))) %>%
+    purrr::set_names(paste0('x',1:ncol(.))) %>% 
+    as.data.frame()
+  z.pred = matrix(predict(fit, newdata = xy), 
+                  nrow = grid.lines, ncol = grid.lines)
+  fig.surf = plot_ly(x = x.pred,y = y.pred,z = z.pred) %>% add_surface()
+  surflm = summary(fit)
+  coefb = surflm$coefficients[,1]
+  names(coefb) = paste0('b',0:(length(coefb)-1))
+  rv = list(coefb,surflm$fstatistic,fig.surf)
+  names(rv) = c('coefficients','fstatistic','surface')
+  return(rv)
+}
+
+surf2 = surf.ls(x, y, z, 2)
+surf2$surface
+
+surf3 = surf.ls(x, y, z, 3)
+surf3$surface
+```
+

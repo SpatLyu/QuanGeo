@@ -1,0 +1,92 @@
+---
+title: "地理建模实验3 实验报告"
+author: "吕文博 地信2101班"
+date: "`r Sys.Date()`"
+output: #latex_document
+  prettydoc::html_pretty:
+    theme: tactile
+    highlight: github
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      dpi = 300,
+                      warning = FALSE,
+                      message = FALSE,
+                      out.width = "100%",
+                      out.height = "100%",
+                      fig.align = 'center',
+                      comment = "##",
+                      htmltools.dir.version = FALSE)
+```
+
+# `R` 语言拟合一元线性回归模型
+
+### 加载数据
+
+```{r}
+dt = readxl::read_xls('../data/exp3/3-SPSS.xls')
+head(dt)
+```
+
+### 拟合一元线性回归模型
+
+```{r}
+lm.model = lm(`降雨量y/mm` ~ `平均气温x/oC`,data = dt)
+summary(lm.model)
+```
+
+*R方为0.2396,说明数据有23.96%的可能被该回归方程解释,数据与模型的拟合程度较低.*
+
+*由回归方程的F检验可得,$P = 0.1063 > 0.05$, F检验无法通过,说明回归方程不显著,自变量不能显著影响因变量.*
+
+*回归模型的方程为 $y = -1.201x + 74.3266$ ,对自变量进行t检验,$P_{(x)} = 0.106 > 0.05$,t检验无法通过,说明自变量不能显著影响因变量.*
+
+### 一元线性回归拟合图表绘制
+
+```{r}
+library(ggplot2)
+
+ggplot(data = dt,
+       aes(x = `平均气温x/oC`,
+           y = `降雨量y/mm`)) +
+  geom_point(shape = 20,size = 2.5,color = 'blue') +
+  geom_smooth(method = 'lm',se = F,color = 'black') +
+  scale_x_continuous(name = latex2exp::TeX("$平均气温 (\\degree C)$"),,
+                     expand = c(0,0),limits = c(3,18)) +
+  scale_y_continuous(name = latex2exp::TeX("$降雨量 (mm)$"),
+                     expand = c(0,0),limits = c(30,90)) +
+  ggpmisc::stat_poly_eq(aes(
+    label = paste0("atop(", after_stat(eq.label),
+                   ",",
+                   after_stat(rr.label), ")")),
+    formula = y ~ x,
+    label.x = "left",
+    label.y = "bottom",
+    parse = TRUE) +
+  theme_classic()
+```
+
+# `Python` 拟合一元线性回归模型
+
+```{python,engine.path = "d:/miniconda3/envs/geocompy/python.exe"}
+import numpy as np
+import pandas as pd
+import statsmodels.api as sm
+import matplotlib.pyplot as plt
+
+dt = pd.read_excel('../data/exp3/3-SPSS.xls')
+dt.head()
+
+X = dt.loc[:,'平均气温x/oC']
+y = dt.loc[:,'降雨量y/mm']
+X = sm.add_constant (X)
+lm_model = sm.OLS(y,X).fit()
+print(lm_model.summary())
+```
+
+*R方为0.2396,说明数据有23.96%的可能被该回归方程解释,数据与模型的拟合程度较低.*
+
+*由回归方程的F检验可得,$P = 0.1063 > 0.05$, F检验无法通过,说明回归方程不显著,自变量不能显著影响因变量.*
+
+*回归模型的方程为 $y = -1.201x + 74.3266$ ,对自变量进行t检验,$P_{(x)} = 0.106 > 0.05$,t检验无法通过,说明自变量不能显著影响因变量.*

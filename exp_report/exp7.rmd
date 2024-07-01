@@ -1,0 +1,73 @@
+---
+title: "地理建模实验7 实验报告"
+author: "吕文博 地信2101班"
+date: "`r Sys.Date()`"
+output: latex_document
+  # prettydoc::html_pretty:
+  #   theme: tactile
+  #   highlight: github
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      dpi = 300,
+                      warning = FALSE,
+                      message = FALSE,
+                      out.width = "100%",
+                      out.height = "100%",
+                      fig.align = 'center',
+                      fig.path = '../picture/rmd/exp7/',
+                      comment = "##",
+                      htmltools.dir.version = FALSE)
+```
+
+## 层次聚类
+
+`baseR`函数`hclust`的`method`参数中:
+
+- `ward.D` Ward 的最小方差方法,基于欧氏距离的平方
+
+- `ward.D2` Ward 的最小方差方法,基于欧氏距离的平方和
+
+- `single` 最小距离法
+
+- `complete` 最大距离法
+
+- `average` 类平均距离法
+
+- `mcquitty` 类加权平均距离法
+
+- `median` 中间距离法
+
+- `centroid` 重心距离法
+
+### 读取数据
+
+```{r}
+scores = readxl::read_xls('../data/exp7/7.xls')
+scores = t(as.matrix(scores[,-1]))
+scores
+```
+
+### 最短距离聚类
+
+```{r fig.width=7.5,fig.height=4.5}
+d = dist(scores,method = 'euclidean', diag = TRUE)
+clus1 = hclust(d, method = "single")
+library(ggplot2)
+library(ggdendro)
+ggdendrogram(clus1, rotate = FALSE, size = 2) +
+  xlab('类别') +
+  ylab('特征距离') +
+  theme_bw()
+```
+
+### 最远距离聚类
+
+```{r fig.width=7.5,fig.height=4.5}
+clus2 = hclust(d, method = "complete")
+ggdendrogram(clus2, rotate = FALSE, size = 2) +
+  xlab('类别') +
+  ylab('特征距离') +
+  theme_bw()
+```
