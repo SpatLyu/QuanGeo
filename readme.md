@@ -119,11 +119,17 @@
     - 名义尺度数据；用数字表示地理实体、地理要素、地理现象或地理事件的状态类型
 
 17. 变异系数计算公式：
+    
+    
     $$
-    C_v = \frac{S}{\overline x} = \frac{1}{\overline x} \sqrt{\frac{\sum\limits_{i=1}^n (x_i - \overline x)^2}{n-1}}
+C_v = \frac{S}{\overline x} = \frac{1}{\overline x} \sqrt{\frac{\sum\limits_{i=1}^n (x_i - \overline x)^2}{n-1}}
     $$
-
+    
 18. 相关系数:
+
+     
+
+    
     $$
     r_{xy}=\frac{\sum\limits_{i=1}^n\left(x_i-\overline x\right)\left(y_i-\overline y\right)}{\sqrt{\sum\limits_{i=1}^n\left(x_i-\overline x\right)^2}\sqrt{\sum\limits_{i=1}^n\left(y_i-\overline y\right)^2}}
     $$
@@ -131,8 +137,10 @@
     $$
     f = n-2
     $$
-    
+
 19. 一元线性回归:
+
+    
     $$
     k = \frac{\sum\limits_{i=1}^n \left(x_i-\overline x \right)  \left(y_i-\overline y \right)}{\sqrt{\sum\limits_{i=1}^n\left(x_i-\overline x\right)^2}}
     $$
@@ -177,7 +185,7 @@
 
 26. **网络的测度指标：**
 
-    - m为边数目，n为节点数目，p为网络中亚图的数目
+    m为边数目，n为节点数目，p为网络中亚图的数目
 
     - $$
       \beta = \frac{m}{n}
